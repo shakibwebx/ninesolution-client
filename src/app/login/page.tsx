@@ -28,7 +28,13 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
+    // Set a timeout as a fallback
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+      toast.error('Request timed out');
+    }, 10000); // 10 seconds
+  
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
         method: 'POST',
@@ -36,16 +42,17 @@ const LoginPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) throw new Error(data.message || 'Login failed');
-
+  
       toast.success('✅ Login Successful!');
       router.push('/dashboard');
     } catch (err: any) {
       toast.error(`❌ ${err.message}`);
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
