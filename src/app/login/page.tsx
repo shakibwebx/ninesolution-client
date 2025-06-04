@@ -67,11 +67,11 @@ export default function LoginPage() {
         throw new Error(errorMessage);
       }
 
-      toast.success('✅ Login Successful!');
+      toast.success('Login Successful!');
       localStorage.setItem('auth_token', data.token);
       router.push('/dashboard');
     } catch (err: any) {
-      toast.error(`❌ ${err.message || 'An unexpected error occurred'}`);
+      toast.error(`${err.message || 'An unexpected error occurred'}`);
     } finally {
       setLoading(false);
     }

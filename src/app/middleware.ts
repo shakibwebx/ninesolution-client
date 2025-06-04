@@ -5,7 +5,7 @@ export function middleware(req: NextRequest) {
   const hostname = req.headers.get('host') || '';
   const subdomain = getSubdomain(hostname);
 
-  if (subdomain && !['www', '.ninesolution-client.vercel.app', ''].includes(subdomain)) {
+  if (subdomain && !['www', '.vercel.app', ''].includes(subdomain)) {
     const url = req.nextUrl.clone();
     url.pathname = `/shop/${subdomain}${url.pathname}`;
     return NextResponse.rewrite(url);
