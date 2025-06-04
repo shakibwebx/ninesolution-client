@@ -1,52 +1,71 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-const ShopDashboard = ({ shopName }: { shopName: string }) => {
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
-    const router = useRouter();
+function LoadingSpinner() {
+  return <div>Loading...</div>; // Replace with fancier spinner if needed
+}
 
-    useEffect(() => {
-        const verifyAuth = async () => {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
+export default function ShopDashboard() {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
-                if (!res.ok) throw new Error('Unauthenticated');
+  // Extract shop name from subdomain
+  const shopName = (() => {
+    if (typeof window === 'undefined') return '';
+    const host = window.location.hostname; // e.g. "beautyhub.localhost"
+    return host.split('.')[0];
+  })();
 
-                setAuthenticated(true);
-            } catch (error) {
-                router.push('/login');
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    // Try to get token from localStorage
+    const localToken = localStorage.getItem('auth_token');
+    if (localToken) {
+      setToken(localToken);
+    } else {
+      // No token - redirect to main login after short delay
+      setTimeout(() => {
+        window.location.href = 'http://localhost:3000/login';
+      }, 1500);
+    }
+  }, []);
 
-        verifyAuth();
-    }, [router]);
+  useEffect(() => {
+    if (!token) return;
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="loader">Loading...</div> {/* Replace with your spinner */}
-            </div>
+    const verifyToken = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
-    }
+        if (!res.ok) throw new Error('Invalid token');
 
-    if (!authenticated) {
-        return null; // This will be rare as router redirects
-    }
+        const data = await res.json();
+        setUser(data.user);
+      } catch (error) {
+        localStorage.removeItem('auth_token');
+        window.location.href = 'http://localhost:3000/login';
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return (
-        <div>
-            <h1>This is {shopName} shop</h1>
-            {/* Your shop dashboard content here */}
-        </div>
-    );
-};
+    verifyToken();
+  }, [token]);
 
-export default ShopDashboard;
+  if (loading) return <LoadingSpinner />;
+
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-4">
+        This is <span className="text-blue-600">{shopName}</span> shop
+      </h1>
+      {user && <p>Welcome, {user.username}</p>}
+    </div>
+  );
+}

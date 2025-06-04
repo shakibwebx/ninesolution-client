@@ -72,6 +72,8 @@ const Dashboard = () => {
         throw new Error('Logout failed');
       }
 
+      localStorage.removeItem('auth_token');
+
       toast.success('Logged out successfully');
       router.push('/login');
     } catch (error) {
@@ -79,26 +81,27 @@ const Dashboard = () => {
       toast.error('Logout failed. Please try again.');
     }
   };
+  
 
   const handleShopRedirect = (shop: string) => {
-    // Validate shop name
-    if (!/^[a-z0-9-]+$/i.test(shop)) {
-      toast.error('Invalid shop name');
-      return;
-    }
+    const auth_token = localStorage.getItem('auth_token');
+    console.log(auth_token, "This is auth token");
+    const shopUrl = `http://${shop}.localhost:3000/shop`;
+    const shopWindow = window.open(shopUrl, '_blank');
 
-    // For development using localhost subdomains
-    if (process.env.NODE_ENV === 'development') {
-      // First set a cookie on the main domain
-      document.cookie = `parentAuth=true; path=/; domain=localhost`;
-      
-      // Then redirect
-      window.location.href = `http://${shop}.localhost:3000`;
-    } else {
-      // Production redirect
-      window.location.href = `https://${shop}.yourdomain.com`;
-    }
+    
+      if (shopWindow) {
+        shopWindow.postMessage({ auth_token }, shopUrl);
+        const interval = setInterval(() => {
+          shopWindow.postMessage({ auth_token }, `http://${shop}.localhost:3000/shop`);
+        }, 1000);
+        setTimeout(() => clearInterval(interval), 5000);
+      }
+    
   };
+
+  
+
 
   if (loading) {
     return (
