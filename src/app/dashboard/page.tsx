@@ -86,14 +86,14 @@ const Dashboard = () => {
   const handleShopRedirect = (shop: string) => {
     const auth_token = localStorage.getItem('auth_token');
     console.log(auth_token, "This is auth token");
-    const shopUrl = `http://${shop}.localhost:3000/shop`;
+    const shopUrl = `http://${shop}.ninesolution-client.vercel.app/shop`;
     const shopWindow = window.open(shopUrl, '_blank');
 
     
       if (shopWindow) {
         shopWindow.postMessage({ auth_token }, shopUrl);
         const interval = setInterval(() => {
-          shopWindow.postMessage({ auth_token }, `http://${shop}.localhost:3000/shop`);
+          shopWindow.postMessage({ auth_token }, `http://${shop}.ninesolution-client.vercel.app/shop`);
         }, 1000);
         setTimeout(() => clearInterval(interval), 5000);
       }

@@ -10,7 +10,7 @@ const ShopPage = () => {
     const [subdomain] = hostname.split('.');
 
     // If you're using localhost, subdomain will be `beautyhub` from `beautyhub.localhost`
-    if (subdomain && subdomain !== 'localhost') {
+    if (subdomain && subdomain !== 'ninesolution-client.vercel.app') {
       setShopName(subdomain);
     }
   }, []);

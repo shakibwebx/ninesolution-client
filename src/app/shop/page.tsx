@@ -30,7 +30,7 @@ export default function ShopDashboard() {
   // 🔐 3. Listen for postMessage auth events (optional for cross-subdomain login/logout)
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      if (event.origin !== 'http://localhost:3000') return;
+      if (event.origin !== 'http://ninesolution-client.vercel.app') return;
 
       const { auth_token, type } = event.data || {};
 
@@ -43,12 +43,12 @@ export default function ShopDashboard() {
         localStorage.removeItem('auth_token');
         setUser(null);
         setToken(null);
-        router.push('http://localhost:3000/login');
+        router.push('http://ninesolution-client.vercel.app/login');
       }
     };
 
     window.addEventListener('message', handler);
-    window.opener?.postMessage({ status: 'ready' }, 'http://localhost:3000');
+    window.opener?.postMessage({ status: 'ready' }, 'http://ninesolution-client.vercel.app');
 
     return () => window.removeEventListener('message', handler);
   }, [router]);

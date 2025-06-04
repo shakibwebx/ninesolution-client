@@ -38,13 +38,13 @@ const SignUp = () => {
     e.preventDefault();
 
     if (!validatePassword(formData.password)) {
-      toast.error('❌ Password must be 8+ characters, with a number & special character');
+      toast.error('Password must be 8+ characters, with a number & special character');
       return;
     }
 
     const filteredShops = formData.shops.filter((shop) => shop.trim() !== '');
     if (filteredShops.length < 3) {
-      toast.error('❌ Please enter at least 3 shop names');
+      toast.error('Please enter at least 3 shop names');
       return;
     }
 
@@ -64,7 +64,7 @@ const SignUp = () => {
       toast.success('✅ Account created! Please login');
       router.push('/login');
     } catch (err: any) {
-      toast.error(`❌ ${err.message}`);
+      toast.error(`${err.message}`);
     } finally {
       setLoading(false);
     }
